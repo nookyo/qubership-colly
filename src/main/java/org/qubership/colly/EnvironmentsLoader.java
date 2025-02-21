@@ -30,14 +30,12 @@ public class EnvironmentsLoader {
     public List<Environment> loadEnvironments() {
         List<Environment> result = new ArrayList<>();
         List<KubeConfig> kubeConfigs = kubeConfigLoader.loadKubeConfigs();
-        kubeConfigs.stream().forEach(kubeConfig -> {
-            result.addAll(loadClusterEnvironments(kubeConfig));
-        });
+        kubeConfigs.forEach(kubeConfig -> result.addAll(loadClusterEnvironments(kubeConfig)));
         return result;
     }
 
     private List<Environment> loadClusterEnvironments(KubeConfig kubeConfig) {
-        List<Environment> environments = new ArrayList<>();
+        List<Environment> environments;
 
         Cluster cluster = new Cluster(kubeConfig.getCurrentContext());
         try {
@@ -56,7 +54,7 @@ public class EnvironmentsLoader {
                             new Namespace(v1Namespace.getMetadata().getName(), v1Namespace.getMetadata().getUid(), v1Namespace.getMetadata().getLabels().getOrDefault(ENVIRONMENT_NAME, v1Namespace.getMetadata().getName())))
                     .collect(Collectors.groupingBy(Namespace::envName));
 
-            environments.addAll(namespaceToEnvName.entrySet().stream()
+            environments = new ArrayList<>(namespaceToEnvName.entrySet().stream()
                     .map(stringListEntry -> new Environment(stringListEntry.getKey(), cluster, stringListEntry.getValue()))
                     .toList());
 
