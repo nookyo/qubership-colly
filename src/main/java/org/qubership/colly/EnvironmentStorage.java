@@ -3,7 +3,6 @@ package org.qubership.colly;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.qubership.colly.data.Environment;
 
 import java.util.ArrayList;
