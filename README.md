@@ -3,14 +3,14 @@
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 ## Goal
-* The tool is designed for tracking the usage of clusters and environments within clusters.
-* Support several clusters
-* (todo) ability to group several namespaces into one environment
-* (todo) ability to show information (name, version) about deployed helm packages
-  * (optional) support argo packages
-* (todo) collect resources and metrics from kubernetes and monitoring
-* (todo) show additional custom UI parameters for environment (owner, description, purpose)
 
+- The tool is designed for tracking the usage of clusters and environments within clusters.
+- Support several clusters
+- (todo) ability to group several namespaces into one environment
+- (todo) ability to show information (name, version) about deployed helm packages
+  - (optional) support argo packages
+- (todo) collect resources and metrics from kubernetes and monitoring
+- (todo) show additional custom UI parameters for environment (owner, description, purpose)
 
 ## Running the application in dev mode
 
@@ -20,7 +20,7 @@ You can run your application in dev mode that enables live coding using:
 ./mvnw quarkus:dev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+> **_NOTE:_** Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 
 ## Packaging and running the application
 
@@ -64,6 +64,6 @@ If you want to learn more about building native executables, please consult <htt
 ## Run in Docker
 
 ```shell script
-docker build -f src/main/docker/Dockerfile.jvm -t qubership/qubership-colly . 
+docker build -f src/main/docker/Dockerfile.jvm -t qubership/qubership-colly .
 docker run -v ~/.kube:/kubeconfigs -i --rm -p 8080:8080 qubership/qubership-colly
 ```
