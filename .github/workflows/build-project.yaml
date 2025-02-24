@@ -1,0 +1,33 @@
+name: Build Project
+
+on:
+  push:
+    branches:
+      - "!main"
+      - "!releases/**"
+
+permissions:
+  packages: write
+
+jobs:
+  mvn-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Display settings.xml
+        run: cat ~/.m2/settings.xml
+      - name: "Maven build"
+        run: |
+          mvn --batch-mode clean install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USER: ${{ github.actor }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
