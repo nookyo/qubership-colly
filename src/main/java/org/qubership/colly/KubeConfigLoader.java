@@ -1,6 +1,7 @@
 package org.qubership.colly;
 
 import io.kubernetes.client.util.KubeConfig;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -21,6 +22,7 @@ public class KubeConfigLoader {
     public List<KubeConfig> loadKubeConfigs() {
         List<KubeConfig> kubeConfigs = new ArrayList<>();
         Path dir = Paths.get(kubeconfigFolder);
+        Log.debug("Loading kubeconfigs from " + dir);
         try (Stream<Path> paths = Files.list(dir)) {
             paths.filter(Files::isRegularFile)
                     .forEach(fileName -> {
@@ -31,10 +33,9 @@ public class KubeConfigLoader {
                         }
                     });
         } catch (IOException e) {
-            System.err.println("[ERROR] Failed to read files: " + e.getMessage());
+            Log.error("[ERROR] Failed to read files: " + e.getMessage());
         }
-
-        System.out.println(kubeConfigs.size() + " kubeconfigs parsed");
+        Log.info("[INFO] Loaded " + kubeConfigs.size() + " kubeconfigs");
         return kubeConfigs;
     }
 }

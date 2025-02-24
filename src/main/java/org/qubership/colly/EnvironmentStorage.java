@@ -1,5 +1,6 @@
 package org.qubership.colly;
 
+import io.quarkus.logging.Log;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -19,10 +20,9 @@ public class EnvironmentStorage {
 
     @Scheduled(cron = "{cron.schedule}")
     void executeTask() {
-        System.out.println("Executing task");
+        Log.info("Task for loading resources from clusters has started");
         environments = environmentsLoader.loadEnvironments();
-        environments.forEach(System.out::println);
-        System.out.println("Finished executing task");
+        Log.info("Task completed. Total environments loaded: " + environments.size());
     }
 
     public List<Environment> getEnvironments() {

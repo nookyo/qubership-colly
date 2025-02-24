@@ -7,6 +7,7 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.KubeConfig;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.qubership.colly.data.Cluster;
@@ -57,6 +58,7 @@ public class EnvironmentsLoader {
             environments = new ArrayList<>(namespaceToEnvName.entrySet().stream()
                     .map(stringListEntry -> new Environment(stringListEntry.getKey(), cluster, stringListEntry.getValue()))
                     .toList());
+            Log.debug("Loaded " + environments.size() + " environments for cluster = " + cluster.name());
 
         } catch (ApiException e) {
             throw new RuntimeException("Can't load resources from cluster - " + cluster, e);
