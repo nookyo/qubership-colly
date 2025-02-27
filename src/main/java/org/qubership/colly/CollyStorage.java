@@ -4,7 +4,7 @@ import io.quarkus.logging.Log;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.qubership.colly.data.Cluster;
+import org.qubership.colly.data.ClusterDto;
 import org.qubership.colly.data.Environment;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class CollyStorage {
     @Inject
     EnvironmentsLoader environmentsLoader;
 
-    private List<Cluster> clusters = new ArrayList<>();
+    private List<ClusterDto> clusters = new ArrayList<>();
 
     @Scheduled(cron = "{cron.schedule}")
     void executeTask() {
@@ -32,7 +32,7 @@ public class CollyStorage {
         return environmentsLoader.loadEnvironments();
     }
 
-    public List<Cluster> getClusters() {
+    public List<ClusterDto> getClusters() {
         return Collections.unmodifiableList(clusters);
     }
 }

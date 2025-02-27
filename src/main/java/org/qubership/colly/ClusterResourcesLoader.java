@@ -14,6 +14,7 @@ import jakarta.inject.Inject;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.qubership.colly.data.*;
+import org.qubership.colly.storage.ClusterRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,14 +28,14 @@ public class ClusterResourcesLoader {
     KubeConfigLoader kubeConfigLoader;
 
 
-    public List<Cluster> loadClusters() {
-        List<Cluster> result = new ArrayList<>();
+    public List<ClusterDto> loadClusters() {
+        List<ClusterDto> result = new ArrayList<>();
         List<KubeConfig> kubeConfigs = kubeConfigLoader.loadKubeConfigs();
         kubeConfigs.forEach(kubeConfig -> result.add(loadClusterResources(kubeConfig)));
         return result;
     }
 
-    private Cluster loadClusterResources(KubeConfig kubeConfig) {
+    private ClusterDto loadClusterResources(KubeConfig kubeConfig) {
 
         try {
             ApiClient client = ClientBuilder.kubeconfig(kubeConfig).build();
@@ -44,7 +45,7 @@ public class ClusterResourcesLoader {
         }
         CoreV1Api api = new CoreV1Api();
         List<Namespace> namespaces = loadNamespaces(kubeConfig, api);
-        return new Cluster(kubeConfig.getCurrentContext(), namespaces);
+        return new ClusterDto(kubeConfig.getCurrentContext(), namespaces);
     }
 
     @NotNull

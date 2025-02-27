@@ -11,7 +11,7 @@ import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.commons.compress.utils.Lists;
-import org.qubership.colly.data.Cluster;
+import org.qubership.colly.data.ClusterDto;
 import org.qubership.colly.data.Environment;
 import org.qubership.colly.data.Namespace;
 
@@ -39,7 +39,7 @@ public class EnvironmentsLoader {
     private List<Environment> loadClusterEnvironments(KubeConfig kubeConfig) {
         List<Environment> environments;
 
-        Cluster cluster = new Cluster(kubeConfig.getCurrentContext(), Lists.newArrayList());
+        ClusterDto cluster = new ClusterDto(kubeConfig.getCurrentContext(), Lists.newArrayList());
         try {
             ApiClient client = ClientBuilder.kubeconfig(kubeConfig).build();
             Configuration.setDefaultApiClient(client);
