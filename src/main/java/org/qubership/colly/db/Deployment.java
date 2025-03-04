@@ -1,6 +1,7 @@
 package org.qubership.colly.db;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
@@ -11,7 +12,7 @@ public class Deployment extends PanacheEntityBase {
     public String uid;
     public String name;
     public int replicas;
-    @Lob
+    @Column(columnDefinition = "TEXT")
     public String configuration;
 
     public Deployment(String uid, String name, int replicas, String configuration) {

@@ -1,6 +1,7 @@
 package org.qubership.colly.db;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
@@ -11,7 +12,7 @@ public class ConfigMap extends PanacheEntityBase {
     public String uid;
     public String name;
     //    public Map<String, String> content;
-    @Lob
+    @Column(columnDefinition = "TEXT")
     public String configuration;
 
     public ConfigMap(String uid, String name, String configuration) {
