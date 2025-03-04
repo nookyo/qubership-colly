@@ -19,6 +19,7 @@ import org.qubership.colly.storage.ClusterRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -45,10 +46,14 @@ public class ClusterResourcesLoader {
         }
         CoreV1Api api = new CoreV1Api();
         List<Namespace> namespaces = loadNamespaces(kubeConfig, api);
-        Cluster cluster = new Cluster();
-        cluster.name = kubeConfig.getCurrentContext();
+        return new Cluster(parseClusterName(kubeConfig), namespaces);
+    }
 
-        return new Cluster(kubeConfig.getCurrentContext(), namespaces);
+    private static String parseClusterName(KubeConfig kubeConfig) {
+        Map<String, String> o = (Map<String, String>) kubeConfig.getClusters().get(0);
+        String name = o.get("name");
+        Log.info("[INFO] true cluster name: " + name);
+        return name;
     }
 
     @NotNull
