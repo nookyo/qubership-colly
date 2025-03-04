@@ -14,13 +14,11 @@ import jakarta.inject.Inject;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.qubership.colly.db.*;
-import org.qubership.colly.storage.ClusterRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ClusterResourcesLoader {
@@ -35,7 +33,6 @@ public class ClusterResourcesLoader {
         kubeConfigs.forEach(kubeConfig -> result.add(loadClusterResources(kubeConfig)));
         return result;
     }
-
     private Cluster loadClusterResources(KubeConfig kubeConfig) {
 
         try {
@@ -59,27 +56,27 @@ public class ClusterResourcesLoader {
     @NotNull
     private List<Namespace> loadNamespaces(KubeConfig kubeConfig, CoreV1Api api) {
         CoreV1Api.APIlistNamespaceRequest apilistNamespaceRequest = api.listNamespace();
-        List<Namespace> namespaceDtos;
+        List<Namespace> namespaces;
         try {
             V1NamespaceList list = apilistNamespaceRequest.execute();
-            namespaceDtos = list.getItems().stream()
+            namespaces = list.getItems().stream()
                     .map(v1Namespace ->
                             new Namespace(
                                     v1Namespace.getMetadata().getUid(),
                                     getNameSafely(v1Namespace.getMetadata()),
-                                    "",
+                                    v1Namespace.getMetadata().getLabels().getOrDefault("environmentName", v1Namespace.getMetadata().getName()),
                                     loadDeployments(v1Namespace.getMetadata().getName()),
                                     loadConfigMaps(v1Namespace.getMetadata().getName()),
                                     loadPods(v1Namespace.getMetadata().getName()))
                     )
-                    .collect(Collectors.toList());
+                    .toList();
 
-            Log.debug("Loaded " + namespaceDtos.size() + " namespaces for cluster = " + kubeConfig.getCurrentContext());
+            Log.debug("Loaded " + namespaces.size() + " namespaces for cluster = " + kubeConfig.getCurrentContext());
 
         } catch (ApiException e) {
             throw new RuntimeException("Can't load resources from cluster - " + kubeConfig.getCurrentContext(), e);
         }
-        return namespaceDtos;
+        return namespaces;
     }
 
     private List<Pod> loadPods(String namespaceName) {

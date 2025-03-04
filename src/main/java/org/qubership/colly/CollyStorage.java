@@ -1,6 +1,5 @@
 package org.qubership.colly;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,6 +13,7 @@ import org.qubership.colly.storage.NamespaceRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @ApplicationScoped
@@ -36,11 +36,18 @@ public class CollyStorage {
     @Transactional
     void executeTask() {
         Log.info("Task for loading resources from clusters has started");
+        Date startTime = new Date();
         clusters = clusterResourcesLoader.loadClusters();
+        Date loadCompleteTime = new Date();
         for (Cluster cluster : clusters) {
             storeInDb(cluster);
         }
+        Date storedInDb = new Date();
+        long loadingDuration = loadCompleteTime.getTime() - startTime.getTime();
+        long storingDuration = storedInDb.getTime() - loadCompleteTime.getTime();
         Log.info("Task completed. Total clusters loaded: " + clusters.size());
+        Log.info("Loading Duration =" + loadingDuration + " ms");
+        Log.info("Storing Duration =" + storingDuration + " ms");
     }
 
     public void storeInDb(Cluster newCluster) {
@@ -50,6 +57,8 @@ public class CollyStorage {
             Log.info("before delete namespace count =" + namespaceRepository.count());
             clusterRepository.delete(cluster);
             Log.info("after delete namespace count =" + namespaceRepository.count());
+        } else {
+            Log.debug("new cluster =" + newCluster.name);
         }
         Log.info("cluster is ready to persist " + newCluster.name);
         clusterRepository.persist(newCluster);
