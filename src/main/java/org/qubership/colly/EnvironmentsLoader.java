@@ -13,7 +13,7 @@ import jakarta.inject.Inject;
 import org.apache.commons.compress.utils.Lists;
 import org.qubership.colly.data.ClusterDto;
 import org.qubership.colly.data.Environment;
-import org.qubership.colly.data.Namespace;
+import org.qubership.colly.data.NamespaceDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,16 +50,16 @@ public class EnvironmentsLoader {
         CoreV1Api.APIlistNamespaceRequest apilistNamespaceRequest = api.listNamespace();
         try {
             V1NamespaceList list = apilistNamespaceRequest.execute();
-            Map<String, List<Namespace>> namespaceToEnvName = list.getItems()
+            Map<String, List<NamespaceDto>> namespaceToEnvName = list.getItems()
                     .stream()
                     .map(v1Namespace ->
-                            new Namespace(v1Namespace.getMetadata().getName(),
+                            new NamespaceDto(v1Namespace.getMetadata().getName(),
                                     v1Namespace.getMetadata().getUid(),
                                     v1Namespace.getMetadata().getLabels().getOrDefault(ENVIRONMENT_NAME, v1Namespace.getMetadata().getName()),
                                     Lists.newArrayList(),
                                     Lists.newArrayList(),
                                     Lists.newArrayList()))
-                    .collect(Collectors.groupingBy(Namespace::envName));
+                    .collect(Collectors.groupingBy(NamespaceDto::envName));
 
             environments = new ArrayList<>(namespaceToEnvName.entrySet().stream()
                     .map(stringListEntry -> new Environment(stringListEntry.getKey(), cluster, stringListEntry.getValue()))

@@ -7,6 +7,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.qubership.colly.data.ClusterDto;
 import org.qubership.colly.data.Environment;
+import org.qubership.colly.db.Cluster;
 
 import java.util.List;
 
@@ -34,8 +35,17 @@ public class ClusterResourcesRest {
     @GET
     @Path("/tick")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ClusterDto> loadEnvironmentsManually() {
+    public List<Cluster> loadEnvironmentsManually() {
         return clusterResourcesLoader.loadClusters();
     }
+
+    @GET
+    @Path("/db")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Cluster> loadEClustersFromDB() {
+        return collyStorage.getClustersFromDb();
+    }
+
+
 }
 

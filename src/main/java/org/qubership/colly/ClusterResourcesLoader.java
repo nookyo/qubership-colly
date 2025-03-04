@@ -13,7 +13,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
-import org.qubership.colly.data.*;
+import org.qubership.colly.db.*;
 import org.qubership.colly.storage.ClusterRepository;
 
 import java.io.IOException;
@@ -28,14 +28,14 @@ public class ClusterResourcesLoader {
     KubeConfigLoader kubeConfigLoader;
 
 
-    public List<ClusterDto> loadClusters() {
-        List<ClusterDto> result = new ArrayList<>();
+    public List<Cluster> loadClusters() {
+        List<Cluster> result = new ArrayList<>();
         List<KubeConfig> kubeConfigs = kubeConfigLoader.loadKubeConfigs();
         kubeConfigs.forEach(kubeConfig -> result.add(loadClusterResources(kubeConfig)));
         return result;
     }
 
-    private ClusterDto loadClusterResources(KubeConfig kubeConfig) {
+    private Cluster loadClusterResources(KubeConfig kubeConfig) {
 
         try {
             ApiClient client = ClientBuilder.kubeconfig(kubeConfig).build();
@@ -45,19 +45,23 @@ public class ClusterResourcesLoader {
         }
         CoreV1Api api = new CoreV1Api();
         List<Namespace> namespaces = loadNamespaces(kubeConfig, api);
-        return new ClusterDto(kubeConfig.getCurrentContext(), namespaces);
+        Cluster cluster = new Cluster();
+        cluster.name = kubeConfig.getCurrentContext();
+
+        return new Cluster(kubeConfig.getCurrentContext(), namespaces);
     }
 
     @NotNull
     private List<Namespace> loadNamespaces(KubeConfig kubeConfig, CoreV1Api api) {
         CoreV1Api.APIlistNamespaceRequest apilistNamespaceRequest = api.listNamespace();
-        List<Namespace> namespaces;
+        List<Namespace> namespaceDtos;
         try {
             V1NamespaceList list = apilistNamespaceRequest.execute();
-            namespaces = list.getItems().stream()
+            namespaceDtos = list.getItems().stream()
                     .map(v1Namespace ->
-                            new Namespace(getNameSafely(v1Namespace.getMetadata()),
+                            new Namespace(
                                     v1Namespace.getMetadata().getUid(),
+                                    getNameSafely(v1Namespace.getMetadata()),
                                     "",
                                     loadDeployments(v1Namespace.getMetadata().getName()),
                                     loadConfigMaps(v1Namespace.getMetadata().getName()),
@@ -65,12 +69,12 @@ public class ClusterResourcesLoader {
                     )
                     .collect(Collectors.toList());
 
-            Log.debug("Loaded " + namespaces.size() + " namespaces for cluster = " + kubeConfig.getCurrentContext());
+            Log.debug("Loaded " + namespaceDtos.size() + " namespaces for cluster = " + kubeConfig.getCurrentContext());
 
         } catch (ApiException e) {
             throw new RuntimeException("Can't load resources from cluster - " + kubeConfig.getCurrentContext(), e);
         }
-        return namespaces;
+        return namespaceDtos;
     }
 
     private List<Pod> loadPods(String namespaceName) {
@@ -80,7 +84,9 @@ public class ClusterResourcesLoader {
         try {
             V1PodList execute = request.execute();
             pods = execute.getItems().stream()
-                    .map(v1Pod ->new Pod(v1Pod.getMetadata().getName(),
+                    .map(v1Pod -> new Pod(
+                            v1Pod.getMetadata().getUid(),
+                            v1Pod.getMetadata().getName(),
                             v1Pod.getStatus().getPhase(),
                             v1Pod.toJson()))
                     .toList();
@@ -101,7 +107,11 @@ public class ClusterResourcesLoader {
             throw new RuntimeException(e);
         }
         List<ConfigMap> configMaps = configMapList.getItems().stream().map(v1ConfigMap ->
-                new ConfigMap(getNameSafely(v1ConfigMap.getMetadata()), v1ConfigMap.getData(), v1ConfigMap.toJson())).toList();
+                new ConfigMap(
+                        v1ConfigMap.getMetadata().getUid(),
+                        getNameSafely(v1ConfigMap.getMetadata()),
+                        /*v1ConfigMap.getData(),*/
+                        v1ConfigMap.toJson())).toList();
         Log.debug("Loaded " + configMaps.size() + " config maps for namespace = " + namespaceName);
         return configMaps;
     }
@@ -121,6 +131,7 @@ public class ClusterResourcesLoader {
         }
         deployments.addAll(deploymentList.getItems().stream()
                 .map(v1Deployment -> new Deployment(
+                        v1Deployment.getMetadata().getUid(),
                         getNameSafely(v1Deployment.getMetadata()),
                         v1Deployment.getSpec().getReplicas(),
                         v1Deployment.toJson()))
