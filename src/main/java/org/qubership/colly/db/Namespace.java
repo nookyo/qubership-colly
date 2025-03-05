@@ -8,7 +8,7 @@ import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
-@Entity
+@Entity(name = "namespaces")
 public class Namespace extends PanacheEntityBase {
     @Id
     public String uid;

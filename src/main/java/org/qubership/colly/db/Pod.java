@@ -4,9 +4,8 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 
-@Entity
+@Entity(name = "pods")
 public class Pod extends PanacheEntityBase {
 
     @Id

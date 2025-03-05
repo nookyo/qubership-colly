@@ -47,7 +47,7 @@ public class ClusterResourcesLoader {
     }
 
     private static String parseClusterName(KubeConfig kubeConfig) {
-        Map<String, String> o = (Map<String, String>) kubeConfig.getClusters().get(0);
+        Map<String, String> o = (Map<String, String>) kubeConfig.getClusters().getFirst();
         String name = o.get("name");
         Log.info("[INFO] true cluster name: " + name);
         return name;
@@ -112,7 +112,7 @@ public class ClusterResourcesLoader {
                 new ConfigMap(
                         v1ConfigMap.getMetadata().getUid(),
                         getNameSafely(v1ConfigMap.getMetadata()),
-                        /*v1ConfigMap.getData(),*/
+                        v1ConfigMap.getData(),
                         v1ConfigMap.toJson())).toList();
         Log.debug("Loaded " + configMaps.size() + " config maps for namespace = " + namespaceName);
         return configMaps;

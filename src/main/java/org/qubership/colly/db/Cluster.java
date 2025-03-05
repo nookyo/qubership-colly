@@ -8,7 +8,7 @@ import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
-@Entity
+@Entity(name = "clusters")
 public class Cluster extends PanacheEntityBase {
     @Id
     public String name;

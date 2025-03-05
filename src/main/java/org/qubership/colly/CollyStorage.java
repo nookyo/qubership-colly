@@ -11,7 +11,6 @@ import org.qubership.colly.db.Cluster;
 import org.qubership.colly.storage.ClusterRepository;
 import org.qubership.colly.storage.NamespaceRepository;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -30,14 +29,12 @@ public class CollyStorage {
     @Inject
     NamespaceRepository namespaceRepository;
 
-    private List<Cluster> clusters = new ArrayList<>();
-
     @Scheduled(cron = "{cron.schedule}")
     @Transactional
     void executeTask() {
         Log.info("Task for loading resources from clusters has started");
         Date startTime = new Date();
-        clusters = clusterResourcesLoader.loadClusters();
+        List<Cluster> clusters = clusterResourcesLoader.loadClusters();
         Date loadCompleteTime = new Date();
         for (Cluster cluster : clusters) {
             storeInDb(cluster);
