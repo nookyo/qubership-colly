@@ -13,12 +13,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
-import org.qubership.colly.data.*;
+import org.qubership.colly.db.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @ApplicationScoped
 public class ClusterResourcesLoader {
@@ -33,7 +33,6 @@ public class ClusterResourcesLoader {
         kubeConfigs.forEach(kubeConfig -> result.add(loadClusterResources(kubeConfig)));
         return result;
     }
-
     private Cluster loadClusterResources(KubeConfig kubeConfig) {
 
         try {
@@ -44,7 +43,14 @@ public class ClusterResourcesLoader {
         }
         CoreV1Api api = new CoreV1Api();
         List<Namespace> namespaces = loadNamespaces(kubeConfig, api);
-        return new Cluster(kubeConfig.getCurrentContext(), namespaces);
+        return new Cluster(parseClusterName(kubeConfig), namespaces);
+    }
+
+    private static String parseClusterName(KubeConfig kubeConfig) {
+        Map<String, String> o = (Map<String, String>) kubeConfig.getClusters().getFirst();
+        String name = o.get("name");
+        Log.info("[INFO] true cluster name: " + name);
+        return name;
     }
 
     @NotNull
@@ -55,14 +61,15 @@ public class ClusterResourcesLoader {
             V1NamespaceList list = apilistNamespaceRequest.execute();
             namespaces = list.getItems().stream()
                     .map(v1Namespace ->
-                            new Namespace(getNameSafely(v1Namespace.getMetadata()),
+                            new Namespace(
                                     v1Namespace.getMetadata().getUid(),
-                                    "",
+                                    getNameSafely(v1Namespace.getMetadata()),
+                                    v1Namespace.getMetadata().getLabels().getOrDefault("environmentName", v1Namespace.getMetadata().getName()),
                                     loadDeployments(v1Namespace.getMetadata().getName()),
                                     loadConfigMaps(v1Namespace.getMetadata().getName()),
                                     loadPods(v1Namespace.getMetadata().getName()))
                     )
-                    .collect(Collectors.toList());
+                    .toList();
 
             Log.debug("Loaded " + namespaces.size() + " namespaces for cluster = " + kubeConfig.getCurrentContext());
 
@@ -79,7 +86,9 @@ public class ClusterResourcesLoader {
         try {
             V1PodList execute = request.execute();
             pods = execute.getItems().stream()
-                    .map(v1Pod ->new Pod(v1Pod.getMetadata().getName(),
+                    .map(v1Pod -> new Pod(
+                            v1Pod.getMetadata().getUid(),
+                            v1Pod.getMetadata().getName(),
                             v1Pod.getStatus().getPhase(),
                             v1Pod.toJson()))
                     .toList();
@@ -100,7 +109,11 @@ public class ClusterResourcesLoader {
             throw new RuntimeException(e);
         }
         List<ConfigMap> configMaps = configMapList.getItems().stream().map(v1ConfigMap ->
-                new ConfigMap(getNameSafely(v1ConfigMap.getMetadata()), v1ConfigMap.getData(), v1ConfigMap.toJson())).toList();
+                new ConfigMap(
+                        v1ConfigMap.getMetadata().getUid(),
+                        getNameSafely(v1ConfigMap.getMetadata()),
+                        v1ConfigMap.getData(),
+                        v1ConfigMap.toJson())).toList();
         Log.debug("Loaded " + configMaps.size() + " config maps for namespace = " + namespaceName);
         return configMaps;
     }
@@ -120,6 +133,7 @@ public class ClusterResourcesLoader {
         }
         deployments.addAll(deploymentList.getItems().stream()
                 .map(v1Deployment -> new Deployment(
+                        v1Deployment.getMetadata().getUid(),
                         getNameSafely(v1Deployment.getMetadata()),
                         v1Deployment.getSpec().getReplicas(),
                         v1Deployment.toJson()))
