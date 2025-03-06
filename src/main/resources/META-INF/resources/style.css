@@ -1,0 +1,11 @@
+.sortable {
+    cursor: pointer;
+}
+
+.sortable.sort-asc::after {
+    content: ' \25B2'; /* Ascending Arrow */
+}
+
+.sortable.sort-desc::after {
+    content: ' \25BC'; /* Descending Arrow */
+}
