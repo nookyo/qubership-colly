@@ -9,3 +9,10 @@
 .sortable.sort-desc::after {
     content: ' \25BC'; /* Descending Arrow */
 }
+
+#emptyState {
+    text-align: center;
+    color: #6c757d;
+    margin-top: 20px;
+    display: none;
+}
