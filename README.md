@@ -6,7 +6,7 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 - The tool is designed for tracking the usage of clusters and environments within clusters.
 - Support several clusters
-- (todo) ability to group several namespaces into one environment
+- ability to group several namespaces into one environment
 - (todo) ability to show information (name, version) about deployed helm packages
   - (optional) support argo packages
 - (todo) collect resources and metrics from kubernetes and monitoring
