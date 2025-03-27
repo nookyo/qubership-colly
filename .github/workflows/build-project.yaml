@@ -60,12 +60,12 @@ jobs:
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
           echo "tags: ${TAGS}" >> $GITHUB_STEP_SUMMARY
 
-    docker-build:
-      uses: netcracker/qubership-workflow-hub/.github/workflows/docker-publish.yml@main
-      needs: perform-version
-      with:
-        ref: ${{ github.event.ref }}
-        artifact-id: ${{ github.event.inputs.artifact-name || github.event.repository.name }}
-        dry-run: ${{ github.event.inputs.dry-run }}
-        download-artifact: true
-        tags: ${{ needs.perform-version.outputs.tags }}
+  docker-build:
+    uses: netcracker/qubership-workflow-hub/.github/workflows/docker-publish.yml@main
+    needs: perform-version
+    with:
+      ref: ${{ github.event.ref }}
+      artifact-id: ${{ github.event.inputs.artifact-name || github.event.repository.name }}
+      dry-run: ${{ github.event.inputs.dry-run }}
+      download-artifact: true
+      tags: ${{ needs.perform-version.outputs.tags }}
