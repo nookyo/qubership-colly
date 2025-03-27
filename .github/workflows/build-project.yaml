@@ -89,5 +89,5 @@ jobs:
       ref: ${{ github.event.ref }}
       artifact-id: ${{ github.event.inputs.artifact-name || github.event.repository.name }}
       dry-run: false
-      download-artifact: true
+      download-artifact: false
       tags: ${{ needs.perform-version.outputs.tags }}
