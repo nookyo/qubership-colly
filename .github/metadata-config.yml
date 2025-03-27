@@ -1,6 +1,6 @@
 branches-template:
   - main: "v{{major}}.{{minor}}.{{patch}}-{{date}}"
-  - "feature/*": "feature-{{ref-name}}-{{timestamp}}.{{dis-tag}}"
+  - "feature/*": "feature-{{ref-name}}-{{timestamp}}"
   - "release/*": "release-{{ref-name}}-{{timestamp}}.{{dist-tag}}"
   - tag: "v{{major}}.{{minor}}.{{patch}}"
 
