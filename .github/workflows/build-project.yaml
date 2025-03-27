@@ -1,7 +1,28 @@
 name: Build Project
 
-on: push
-
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        default: '1.0.0'
+        type: string
+        description: 'Release version (e.g., 1.0.0)'
+      java-version:
+        required: false
+        type: string
+        default: "21"
+        description: 'Java version (e.g., 21)'
+      build-docker:
+        required: false
+        type: boolean
+        default: true
+        description: 'Release docker image if there is Docker file'
+      dry-run:
+        required: false
+        type: boolean
+        default: false
+        description: 'Dry run'
 permissions:
   packages: write
 
