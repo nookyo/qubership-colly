@@ -49,6 +49,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_USER: ${{ github.actor }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      - name: "Upload all Maven target directories"
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'target'
+          path: '**/target'
+          overwrite: 'true'
 
   perform-version:
     runs-on: ubuntu-latest
@@ -89,5 +95,5 @@ jobs:
       ref: ${{ github.event.ref }}
       artifact-id: ${{ github.event.inputs.artifact-name || github.event.repository.name }}
       dry-run: false
-      download-artifact: false
+      download-artifact: true
       tags: ${{ needs.perform-version.outputs.tags }}
