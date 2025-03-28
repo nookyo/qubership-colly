@@ -14,11 +14,6 @@ on:
         type: string
         default: "21"
         description: 'Java version (e.g., 21)'
-      build-docker:
-        required: false
-        type: boolean
-        default: true
-        description: 'Release docker image if there is Docker file'
       dry-run:
         required: false
         type: boolean
@@ -29,33 +24,13 @@ permissions:
 
 jobs:
   mvn-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: "21"
-          distribution: "temurin"
-          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
-      - name: Display settings.xml
-        run: cat ~/.m2/settings.xml
-      - name: "Maven build"
-        run: |
-          mvn --batch-mode clean install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_USER: ${{ github.actor }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      - name: "Upload all Maven target directories"
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.event.repository.name }}
-          path: '**/target'
-          overwrite: 'true'
-
+    uses: netcracker/qubership-workflow-hub/.github/workflows/maven-publish.yml@main
+    with:
+      maven-command: "--batch-mode package"
+      upload-artifact: true
+      artifact-id: ${{ github.event.repository.name }}
+    secrets:
+      maven-token: ${{ secrets.GITHUB_TOKEN }}
   perform-version:
     runs-on: ubuntu-latest
     needs: mvn-build
@@ -93,7 +68,7 @@ jobs:
     needs: perform-version
     with:
       ref: ${{ github.event.ref }}
-      artifact-id: ${{ github.event.inputs.artifact-name || github.event.repository.name }}
+      artifact-id: ${{ github.event.repository.name }}
       dry-run: false
       download-artifact: true
       tags: ${{ needs.perform-version.outputs.tags }}
