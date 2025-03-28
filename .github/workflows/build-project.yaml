@@ -9,11 +9,6 @@ on:
         default: '1.0.0'
         type: string
         description: 'Release version (e.g., 1.0.0)'
-      dry-run:
-        required: false
-        type: boolean
-        default: false
-        description: 'Dry run'
 permissions:
   packages: write
 
@@ -63,6 +58,6 @@ jobs:
     with:
       ref: ${{ github.event.ref }}
       artifact-id: ${{ github.event.repository.name }}
-      dry-run: ${{ github.event.inputs.dry-run }}
+      dry-run: false
       download-artifact: true
       tags: ${{ needs.perform-version.outputs.tags }}
