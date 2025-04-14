@@ -40,6 +40,7 @@ jobs:
         run: |
           BASE_TAG="${{ steps.metadata.outputs.result }}"
           EXTRA_TAG="${{ github.event.inputs.tags }}"
+          echo "roro - ${EXTRA_TAG}"
           if [ -n "$EXTRA_TAG" ]; then
             TAGS="${BASE_TAG}, ${EXTRA_TAG}"
           else
@@ -50,6 +51,7 @@ jobs:
       - name: Summary step
         run: |
           echo "**Metadata:** ${{ steps.metadata.outputs.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:** ${{ steps.prepare_tags.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
           echo "**Tags:** ${{ steps.prepare_tags.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
 
   docker-build:
