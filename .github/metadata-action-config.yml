@@ -1,8 +1,8 @@
 branches-template:
-  - main: "v{{major}}.{{minor}}.{{patch}}-{{date}}, {{dist-tags}}"
-  - "feature/*": "feature-{{ref-name}}-{{timestamp}}, {{dist-tags}}"
-  - "bugfix/*": "bugfix-{{ref-name}}-{{timestamp}}, {{dist-tags}}"
-  - tag: "v{{major}}.{{minor}}.{{patch}}, {{dist-tags}}"
+  - main: "v{{major}}.{{minor}}.{{patch}}-{{date}}, {{dist-tag}}"
+  - "feature/*": "feature-{{ref-name}}-{{timestamp}}, {{dist-tag}}"
+  - "bugfix/*": "bugfix-{{ref-name}}-{{timestamp}}, {{dist-tag}}"
+  - tag: "v{{major}}.{{minor}}.{{patch}}, {{dist-tag}}"
 
 dist-tags:
   - main: "latest"
