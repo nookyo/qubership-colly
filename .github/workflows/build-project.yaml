@@ -74,6 +74,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: debug
+        run: |
+           ls -la
+
       - name: Docker
         uses: nookyo/qubership-workflow-hub/actions/docker-action@main
         with:
