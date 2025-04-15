@@ -69,18 +69,19 @@ jobs:
       dry-run: true
       download-artifact: true
       tags: ${{ needs.perform-version.outputs.tags }}
-#  docker-build:
-#    name: "Build Docker Images"
-#    needs: perform-version
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Docker
-#        uses: nookyo/qubership-workflow-hub/actions/docker-action@main
-#        with:
-#          ref: ${{ github.ref }}
-#          dry-run: true
-#          download-artifact: true
-#          tags: ${{ needs.perform-version.outputs.tags }}
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+ docker-build2:
+   name: "Build Docker Images"
+   needs: perform-version
+   runs-on: ubuntu-latest
+   steps:
+     - name: Docker
+       uses: nookyo/qubership-workflow-hub/actions/docker-action@main
+       with:
+         ref: ${{ github.ref }}
+         dry-run: true
+         download-artifact: true
+         tags: ${{ needs.perform-version.outputs.tags }}
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
